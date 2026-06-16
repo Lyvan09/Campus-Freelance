@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
+import { AuthContext } from '../context/AuthContext';
 
 const CreateMissionForm = ({ onCreated }) => {
   const [formData, setFormData] = useState({
@@ -8,6 +9,7 @@ const CreateMissionForm = ({ onCreated }) => {
     tags: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { token } = useContext(AuthContext);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -23,7 +25,10 @@ const CreateMissionForm = ({ onCreated }) => {
     try {
       const response = await fetch('http://localhost:5000/api/missions', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({ ...formData, tags: tagsArray })
       });
 

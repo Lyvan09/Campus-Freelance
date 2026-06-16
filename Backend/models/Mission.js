@@ -21,11 +21,7 @@ const missionSchema = new mongoose.Schema({
     type: String,
     enum: ['Ouverte', 'Pourvue'],
     default: 'Ouverte',
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-});
+  }
+}, { timestamps: true });
 
 export default mongoose.model('Mission', missionSchema);

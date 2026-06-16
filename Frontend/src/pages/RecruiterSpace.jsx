@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import CreateMissionForm from '../components/CreateMissionForm';
 import ApplicationCard from '../components/ApplicationCard';
 import { Eye, CheckCircle } from 'lucide-react';
+import { AuthContext } from '../context/AuthContext';
 
 const RecruiterSpace = () => {
   const [missions, setMissions] = useState([]);
@@ -9,10 +10,9 @@ const RecruiterSpace = () => {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingApps, setLoadingApps] = useState(false);
+  const { token } = useContext(AuthContext);
 
   const fetchMissions = () => {
-    // Dans une vraie API, on devrait avoir un endpoint /api/missions/all ou /api/missions?recruiter=1
-    // car GET /api/missions retourne uniquement les ouvertes. Mais pour ce MVP, on fait simple.
     fetch('http://localhost:5000/api/missions')
       .then(res => res.json())
       .then(data => {
@@ -36,7 +36,9 @@ const RecruiterSpace = () => {
   const handleSelectMission = (mission) => {
     setSelectedMission(mission);
     setLoadingApps(true);
-    fetch(`http://localhost:5000/api/missions/${mission._id}/apps`)
+    fetch(`http://localhost:5000/api/missions/${mission._id}/apps`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
       .then(res => res.json())
       .then(data => {
         setApplications(data);
@@ -52,6 +54,7 @@ const RecruiterSpace = () => {
     try {
       const res = await fetch(`http://localhost:5000/api/missions/${missionId}/status`, {
         method: 'PATCH',
+        headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
         const updated = await res.json();

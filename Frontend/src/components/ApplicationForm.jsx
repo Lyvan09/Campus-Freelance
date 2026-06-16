@@ -1,12 +1,25 @@
-import { useState } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { Send } from 'lucide-react';
+import { AuthContext } from '../context/AuthContext';
 
 const ApplicationForm = ({ missionId, onSuccess }) => {
+  const { user, token } = useContext(AuthContext);
   const [formData, setFormData] = useState({
     applicantName: '',
     applicantEmail: '',
     coverMessage: '',
   });
+
+  useEffect(() => {
+    if (user) {
+      setFormData(prev => ({
+        ...prev,
+        applicantName: user.nom || '',
+        applicantEmail: user.email || ''
+      }));
+    }
+  }, [user]);
+
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -35,7 +48,10 @@ const ApplicationForm = ({ missionId, onSuccess }) => {
     try {
       const response = await fetch(`http://localhost:5000/api/missions/${missionId}/apply`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': token ? `Bearer ${token}` : ''
+        },
         body: JSON.stringify(formData),
       });
 
